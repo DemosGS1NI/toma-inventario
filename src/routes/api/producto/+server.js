@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 
 // Load environment variables from .env file
 dotenv.config();
+
 export async function GET({ url }) {
     const bodega = url.searchParams.get('bodega');
     const marca = url.searchParams.get('marca');
@@ -17,7 +18,7 @@ export async function GET({ url }) {
 
     try {
         const result = await sql`
-            SELECT numero_parte, descripcion, inventario_fisico, fecha_inventario, incidencias 
+            SELECT numero_parte, descripcion, inventario_fisico, fecha_inventario, incidencia 
             FROM inventario 
             WHERE bodega = ${bodega} AND marca = ${marca} AND codigo_barras = ${codigoBarra}
         `;
@@ -41,3 +42,58 @@ export async function GET({ url }) {
         );
     }
 }
+
+import { sql } from '@vercel/postgres';
+
+export async function PUT({ request }) {
+    try {
+        const { bodega, marca, codigo_barra, ubicacion, inventario_fisico, incidencia } = await request.json();
+
+        if (!bodega || !marca || !codigo_barra || !ubicacion || !inventario_fisico || !incidencia) {
+            return new Response(
+                JSON.stringify({ success: false, message: 'All fields except fecha_inventario are required' }),
+                { status: 400, headers: { 'Content-Type': 'application/json' } }
+            );
+        }
+
+        console.log('Updating product with the following details:');
+        console.log({ bodega, marca, codigo_barra, ubicacion, inventario_fisico, incidencia });
+
+        const currentDateTime = new Date().toISOString();
+
+        const result = await sql`
+            UPDATE inventario
+            SET 
+                ubicacion = ${ubicacion},
+                inventario_fisico = ${inventario_fisico},
+                fecha_inventario = ${currentDateTime},
+                incidencia = ${incidencia}
+            WHERE 
+                bodega = ${bodega} AND 
+                marca = ${marca} AND 
+                codigo_barras = ${codigo_barra}
+        `;
+
+        console.log('SQL Result:', result);
+
+        // Check rowCount to confirm rows were affected
+        if (result.rowCount > 0) {
+            return new Response(
+                JSON.stringify({ success: true, message: 'Product updated successfully' }),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        } else {
+            return new Response(
+                JSON.stringify({ success: false, message: 'Product not found or no changes made' }),
+                { status: 404, headers: { 'Content-Type': 'application/json' } }
+            );
+        }
+    } catch (error) {
+        console.error('Error updating product:', error);
+        return new Response(
+            JSON.stringify({ success: false, message: 'Error updating product' }),
+            { status: 500, headers: { 'Content-Type': 'application/json' } }
+        );
+    }
+}
+

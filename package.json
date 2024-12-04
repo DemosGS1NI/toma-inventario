@@ -34,9 +34,9 @@
 	"dependencies": {
 		"@tailwindcss/forms": "^0.5.9",
 		"@vercel/postgres": "^0.10.0",
+		"@zxing/browser": "^0.1.5",
 		"dotenv": "^16.4.5",
 		"pg": "^8.13.1",
-		"quagga": "^0.12.1",
 		"xlsx": "^0.18.5"
 	}
 }

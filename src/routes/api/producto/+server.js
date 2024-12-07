@@ -18,7 +18,7 @@ export async function GET({ url }) {
 
     try {
         const result = await sql`
-            SELECT numero_parte, descripcion, inventario_fisico, fecha_inventario, incidencia 
+            SELECT numero_parte, descripcion, inventario_fisico, fecha_inventario, categoria_incidencia,incidencia 
             FROM inventario 
             WHERE bodega = ${bodega} AND marca = ${marca} AND codigo_barras = ${codigoBarra}
         `;
@@ -47,7 +47,7 @@ import { sql } from '@vercel/postgres';
 
 export async function PUT({ request }) {
     try {
-        const { bodega, marca, codigo_barra, ubicacion, inventario_fisico, incidencia } = await request.json();
+        const { bodega, marca, ubicacion, codigo_barra, inventario_fisico, categoria_incidencia, incidencia } = await request.json();
 
         if (!bodega || !marca || !codigo_barra || !ubicacion || !inventario_fisico || !incidencia) {
             return new Response(
@@ -67,6 +67,7 @@ export async function PUT({ request }) {
                 ubicacion = ${ubicacion},
                 inventario_fisico = ${inventario_fisico},
                 fecha_inventario = ${currentDateTime},
+                categoria_incidencia = ${categoria_incidencia},
                 incidencia = ${incidencia}
             WHERE 
                 bodega = ${bodega} AND 

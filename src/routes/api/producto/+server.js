@@ -43,8 +43,6 @@ export async function GET({ url }) {
     }
 }
 
-import { sql } from '@vercel/postgres';
-
 export async function PUT({ request }) {
     try {
         const { bodega, marca, ubicacion, codigo_barra, inventario_fisico, categoria_incidencia, incidencia } = await request.json();

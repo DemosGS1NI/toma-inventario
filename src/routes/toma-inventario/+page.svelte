@@ -109,12 +109,12 @@
   }
 
   // Fetch product details based on codigoBarra
-  async function fetchProductDetails() {
+  /* async function fetchProductDetails() {
     try {
       const res = await fetch(`/api/producto?bodega=${selectedBodega}&marca=${selectedMarca}&codigo_barra=${codigoBarra}`);
 
       if (!res.ok) {
-        throw new Error('Error fetching product');
+        throw new Error('Codigo de Barras del Producto no encontrado!');
       }
 
       const data = await res.json();
@@ -135,6 +135,39 @@
       message = 'Error fetching product';
     }
   }
+ */
+ async function fetchProductDetails() {
+  try {
+    const res = await fetch(`/api/producto?bodega=${selectedBodega}&marca=${selectedMarca}&codigo_barra=${codigoBarra}`);
+
+    if (!res.ok) {
+      throw new Error('Codigo de Barras del Producto no encontrado!');
+    }
+
+    const data = await res.json();
+
+    if (data.product && data.product.length > 0) {
+      product = data.product[0];
+      stockQuantity = product.inventario_fisico || 0;
+      incidencia = product.incidencia || '';
+      categoriaIncidencia = product.categoria_incidencia || ''; // Set fetched value or empty
+      message = ''; // Clear message
+    } else {
+      product = null;
+      message = 'Producto no existe';
+      codigoBarra = ''; // Reset codigoBarra for a new scan
+      await tick(); // Wait for DOM updates
+      startScanner('codigoBarra'); // Restart scanner for barcode
+    }
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    message = 'Producto no existe'; // Display error
+    codigoBarra = ''; // Reset codigoBarra for a new scan
+    await tick(); // Wait for DOM updates
+    startScanner('codigoBarra'); // Restart scanner for barcode
+  }
+}
+
 
   // Save changes
   async function saveChanges() {

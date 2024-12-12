@@ -4,6 +4,7 @@ import { config } from 'dotenv';
 
 config(); // Load environment variables
 
+
 export const GET = async () => {
     try {
         // Query to fetch distinct bodega names

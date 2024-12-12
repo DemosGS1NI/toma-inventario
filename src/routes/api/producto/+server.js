@@ -45,9 +45,20 @@ export async function GET({ url }) {
 
 export async function PUT({ request }) {
     try {
-        const { bodega, marca, ubicacion, codigo_barra, inventario_fisico, categoria_incidencia, incidencia } = await request.json();
+        const { bodega, ubicacion, marca, codigo_barras, inventario_fisico, categoria_incidencia, incidencia, actualizado_por } = await request.json();
 
-        if (!bodega || !marca || !codigo_barra || !ubicacion || !inventario_fisico || !incidencia) {
+        console.log(bodega);
+        console.log(ubicacion);
+        console.log(marca);
+        console.log(codigo_barras);
+        console.log(inventario_fisico);
+        console.log(categoria_incidencia);
+        console.log(incidencia);
+        console.log(actualizado_por);
+
+
+
+        if (!bodega || !marca || !codigo_barras ) {
             return new Response(
                 JSON.stringify({ success: false, message: 'All fields except fecha_inventario are required' }),
                 { status: 400, headers: { 'Content-Type': 'application/json' } }
@@ -55,7 +66,7 @@ export async function PUT({ request }) {
         }
 
         console.log('Updating product with the following details:');
-        console.log({ bodega, marca, codigo_barra, ubicacion, inventario_fisico, incidencia });
+        console.log({ bodega, marca, codigo_barras, ubicacion, inventario_fisico, categoria_incidencia,incidencia, actualizado_por });
 
         const currentDateTime = new Date().toISOString();
 
@@ -66,11 +77,12 @@ export async function PUT({ request }) {
                 inventario_fisico = ${inventario_fisico},
                 fecha_inventario = ${currentDateTime},
                 categoria_incidencia = ${categoria_incidencia},
-                incidencia = ${incidencia}
+                incidencia = ${incidencia},
+                actualizado_por =  ${actualizado_por}
             WHERE 
                 bodega = ${bodega} AND 
                 marca = ${marca} AND 
-                codigo_barras = ${codigo_barra}
+                codigo_barras = ${codigo_barras}
         `;
 
         console.log('SQL Result:', result);

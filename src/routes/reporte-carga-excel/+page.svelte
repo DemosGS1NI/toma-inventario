@@ -9,7 +9,7 @@
 
     async function fetchPage(page = 1) {
         try {
-            const res = await fetch(`/api/reporte-carga-excel?page=${page}&limit=${pageSize}`);
+            const res = await fetch(`/api/inventario?page=${page}&limit=${pageSize}`);
             const { data, totalPages: total } = await res.json();
             items = data;
             totalPages = total;

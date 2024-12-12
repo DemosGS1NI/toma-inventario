@@ -7,20 +7,20 @@ dotenv.config();
 export async function GET({ url }) {
     const bodega = url.searchParams.get('bodega');
     const marca = url.searchParams.get('marca');
-    const codigoBarra = url.searchParams.get('codigo_barra');
+    const codigoBarras = url.searchParams.get('codigo_barras');
 
-    if (!bodega || !marca || !codigoBarra) {
+    if (!bodega || !marca || !codigoBarras) {
         return new Response(
-            JSON.stringify({ success: false, message: 'Bodega, Marca, and Codigo de Barra are required' }),
+            JSON.stringify({ success: false, message: 'Bodega, Marca, and Codigo de Barras are required' }),
             { status: 400, headers: { 'Content-Type': 'application/json' } }
         );
     }
 
     try {
         const result = await sql`
-            SELECT numero_parte, descripcion, inventario_fisico, fecha_inventario, categoria_incidencia,incidencia 
+            SELECT numero_parte, descripcion, inventario_fisico, fecha_inventario, categoria_incidencia, incidencia 
             FROM inventario 
-            WHERE bodega = ${bodega} AND marca = ${marca} AND codigo_barras = ${codigoBarra}
+            WHERE bodega = ${bodega} AND marca = ${marca} AND codigo_barras = ${codigoBarras}
         `;
         
         if (result.rows.length > 0) {

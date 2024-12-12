@@ -7,7 +7,7 @@
   let selectedBodega = '';
   let selectedMarca = '';
   let ubicacion = '';
-  let codigoBarra = '';
+  let codigoBarras = '';
   let product = null;
   let stockQuantity = 0;
   let incidencia = '';
@@ -76,8 +76,8 @@
           if (type === 'ubicacion') {
             ubicacion = scannedValue;
             stopScanner();
-          } else if (type === 'codigoBarra') {
-            codigoBarra = scannedValue;
+          } else if (type === 'codigoBarras') {
+            codigoBarras = scannedValue;
             fetchProductDetails();
             stopScanner();
           }
@@ -110,9 +110,10 @@
 
  async function fetchProductDetails() {
   try {
-    const res = await fetch(`/api/producto?bodega=${selectedBodega}&marca=${selectedMarca}&codigo_barra=${codigoBarra}`);
+    const res = await fetch(`/api/producto?bodega=${selectedBodega}&marca=${selectedMarca}&codigo_barras=${codigoBarras}`);
 
     if (!res.ok) {
+      console.log(codigoBarras);
       throw new Error('Codigo de Barras del Producto no encontrado!');
     }
 
@@ -127,16 +128,16 @@
     } else {
       product = null;
       message = 'Producto no existe';
-      codigoBarra = ''; // Reset codigoBarra for a new scan
+      codigoBarras = ''; // Reset codigoBarra for a new scan
       await tick(); // Wait for DOM updates
-      startScanner('codigoBarra'); // Restart scanner for barcode
+      startScanner('codigoBarras'); // Restart scanner for barcode
     }
   } catch (error) {
     console.error('Error fetching product:', error);
     message = 'Producto no existe'; // Display error
-    codigoBarra = ''; // Reset codigoBarra for a new scan
+    codigoBarras = ''; // Reset codigoBarra for a new scan
     await tick(); // Wait for DOM updates
-    startScanner('codigoBarra'); // Restart scanner for barcode
+    startScanner('codigoBarras'); // Restart scanner for barcode
   }
 }
 
@@ -146,12 +147,13 @@
     try {
       const payload = {
         bodega: selectedBodega,
-        marca: selectedMarca,
         ubicacion: ubicacion,
-        codigo_barra: codigoBarra,
+        marca: selectedMarca,
+        codigo_barras: codigoBarras,
         inventario_fisico: stockQuantity,
+        categoria_incidencia: categoriaIncidencia, // Include categoria incidencia in the payload        
         incidencia: incidencia,
-        categoria_incidencia: categoriaIncidencia, // Include categoria incidencia in the payload
+        actualizado_por: 1,
       };
 
       console.log(payload);
@@ -171,7 +173,7 @@
   }
 
   function resetFieldsAfterSave() {
-    codigoBarra = '';
+    codigoBarras = '';
     product = null;
     stockQuantity = 0;
     incidencia = '';
@@ -241,9 +243,9 @@
 
     <!-- Buttons for Scanning or Selecting New Location -->
     <div class="flex space-x-4">
-      {#if !codigoBarra && !isScanning}
+      {#if !codigoBarras && !isScanning}
         <button
-          on:click={() => startScanner('codigoBarra')}
+          on:click={() => startScanner('codigoBarras')}
           class="mt-4 bg-green-500 text-white p-2 rounded">
           Scan Código de Barra
         </button>
@@ -257,10 +259,10 @@
   {/if}
 
   <!-- Display Código de Barra -->
-  {#if codigoBarra}
+  {#if codigoBarras}
     <div class="mb-4">
-      <label for="codigoBarra" class="block text-sm font-medium text-gray-700">Código de Barra</label>
-      <input id="codigoBarra" type="text" bind:value={codigoBarra} readonly class="block w-full mt-1 p-2 border rounded" />
+      <label for="codigoBarras" class="block text-sm font-medium text-gray-700">Código de Barra</label>
+      <input id="codigoBarras" type="text" bind:value={codigoBarras} readonly class="block w-full mt-1 p-2 border rounded" />
     </div>
   {/if}
 

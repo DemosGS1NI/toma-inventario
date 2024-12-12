@@ -4,6 +4,7 @@
 
   let bodegas = [];
   let marcas = [];
+  let categoriasIncidencia = []; // To be fetched from the database
   let selectedBodega = '';
   let selectedMarca = '';
   let ubicacion = '';
@@ -16,17 +17,14 @@
   let scanner = null;
   let isScanning = false;
   let scanningType = ''; // 'ubicacion' or 'codigoBarra'
+  let categoriaIncidencias = '';
 
-  const categoriasIncidencia = [
-    'Ninguna',
-    'Producto Dañado',
-    'Empaque Dañado',
-    'Otro'
-  ]; // Predefined categories
+
 
   // Fetch bodegas on mount
   onMount(async () => {
     await fetchBodegas();
+    await fetchCategoriasIncidencias();
   });
 
   // Fetch bodegas
@@ -50,6 +48,24 @@
       marcas = data.marcas || [];
     } catch (error) {
       console.error('Error fetching marcas:', error);
+    }
+  }
+
+    // Fetch categorias incidencias
+    async function fetchCategoriasIncidencias() {
+    try {
+      const res = await fetch('/api/categorias-incidencias');
+      const data = await res.json();
+
+      console.log('Fetched categories:', data); // Log the response data
+
+      if (res.ok) {
+        categoriasIncidencia = data.map((item) => item.categoria); // Extract only category names
+      } else {
+        console.error('Error fetching categorias incidencias:', data.error);
+      }
+    } catch (error) {
+      console.error('Error fetching categorias incidencias:', error);
     }
   }
 
@@ -276,8 +292,15 @@
       <input id="stock" type="number" bind:value={stockQuantity} class="block w-full mt-1 p-2 border rounded" />
 
       <!-- New Combo Box -->
-      <label for="categoriaIncidencia" class="block text-sm font-medium text-gray-700 mt-2">Categoría Incidencia</label>
-      <select id="categoriaIncidencia" bind:value={categoriaIncidencia} class="block w-full mt-1 p-2 border rounded">
+      <label for="categoriaIncidencia" class="block text-sm font-medium text-gray-700 mt-2">
+        Categoría Incidencia
+      </label>
+      <select
+        id="categoriaIncidencia"
+        bind:value={categoriaIncidencia}
+        class="block w-full mt-1 p-2 border rounded"
+      >
+        <option value="">Select a category</option>
         {#each categoriasIncidencia as categoria}
           <option value={categoria}>{categoria}</option>
         {/each}
